@@ -1,0 +1,6 @@
+@FakePaymentProvider_HostAddress = http://localhost:5181
+
+GET {{FakePaymentProvider_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

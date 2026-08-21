@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "PaymentLedgerService\\PaymentLedgerService.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FakePaymentProvider\\FakePaymentProvider.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

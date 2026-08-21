@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37531.7 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentLedgerService", "PaymentLedgerService\PaymentLedgerService.csproj", "{55121B71-CC84-4516-ABAD-426E2AF46879}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakePaymentProvider", "FakePaymentProvider\FakePaymentProvider.csproj", "{7EFBFB14-08FE-4218-8077-A693F0E86FA9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{55121B71-CC84-4516-ABAD-426E2AF46879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55121B71-CC84-4516-ABAD-426E2AF46879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55121B71-CC84-4516-ABAD-426E2AF46879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55121B71-CC84-4516-ABAD-426E2AF46879}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EFBFB14-08FE-4218-8077-A693F0E86FA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EFBFB14-08FE-4218-8077-A693F0E86FA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EFBFB14-08FE-4218-8077-A693F0E86FA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EFBFB14-08FE-4218-8077-A693F0E86FA9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {152C5AB0-E687-4B59-985D-3B0A867A5A61}
+	EndGlobalSection
+EndGlobal
