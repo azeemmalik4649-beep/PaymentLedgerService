@@ -10,6 +10,7 @@ namespace PaymentLedgerService.Data
         public DbSet<Account> Accounts => Set<Account>();
         public DbSet<LedgerEntry> LedgerEntries => Set<LedgerEntry>();
         public DbSet<IdempotencyKey> IdempotencyKeys => Set<IdempotencyKey>();
+        public DbSet<WebhookEvent> WebhookEvents => Set<WebhookEvent>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LedgerEntry>(entity =>
@@ -29,6 +30,11 @@ namespace PaymentLedgerService.Data
             {
                 // UNIQUE constraint — yehi asal mein duplicate ko rokta hai database level pe
                 entity.HasIndex(e => e.Key).IsUnique();
+            });
+            modelBuilder.Entity<WebhookEvent>(entity =>
+            {
+                // Yehi duplicate events ko rokta hai — same ProviderEventId dobara insert nahi ho sakta
+                entity.HasIndex(e => e.ProviderEventId).IsUnique();
             });
         }
     }
