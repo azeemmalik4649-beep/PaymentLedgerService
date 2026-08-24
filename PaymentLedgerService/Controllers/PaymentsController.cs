@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using PaymentLedgerService.Data;
 using PaymentLedgerService.DTOs;
 using PaymentLedgerService.Models;
-using System.Text.Json;
+using StackExchange.Redis;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace PaymentLedgerService.Controllers
 {
@@ -16,12 +17,14 @@ namespace PaymentLedgerService.Controllers
         private readonly LedgerDbContext _db;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
+        private readonly IConnectionMultiplexer _redis;
 
-        public PaymentsController(LedgerDbContext db, IHttpClientFactory httpClientFactory, IConfiguration config)
+        public PaymentsController(LedgerDbContext db, IHttpClientFactory httpClientFactory, IConfiguration config, IConnectionMultiplexer redis)
         {
             _db = db;
             _httpClientFactory = httpClientFactory;
             _config = config;
+            _redis = redis;
         }
 
         [HttpPost]
@@ -105,6 +108,10 @@ namespace PaymentLedgerService.Controllers
 
                 await _db.SaveChangesAsync();
                 await dbTransaction.CommitAsync();
+                // Cache invalidate karo — dono accounts ka balance ab stale hai
+                var cacheDb = _redis.GetDatabase();
+                await cacheDb.KeyDeleteAsync($"balance:account:{request.FromAccountId}");
+                await cacheDb.KeyDeleteAsync($"balance:account:{request.ToAccountId}");
             }
             catch (DbUpdateException ex)
             {
@@ -262,6 +269,10 @@ namespace PaymentLedgerService.Controllers
 
                 await _db.SaveChangesAsync();
                 await dbTransaction.CommitAsync();
+                // Cache invalidate karo — dono accounts ka balance ab stale hai
+                var cacheDb = _redis.GetDatabase();
+                await cacheDb.KeyDeleteAsync($"balance:account:{request.FromAccountId}");
+                await cacheDb.KeyDeleteAsync($"balance:account:{request.ToAccountId}");
             }
             catch
             {

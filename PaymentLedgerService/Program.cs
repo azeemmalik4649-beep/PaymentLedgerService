@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentLedgerService.Data;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,9 @@ builder.Services.AddHttpClient("default")
         }
         return handler;
     });
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration["RedisSettings:ConnectionString"] ?? "localhost:6379"));
 
 var app = builder.Build();
 

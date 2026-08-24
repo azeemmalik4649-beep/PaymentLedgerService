@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PaymentLedgerService.Data;
 using PaymentLedgerService.Models;
+using StackExchange.Redis;
 
 namespace PaymentLedgerService.Controllers
 {
@@ -10,10 +11,12 @@ namespace PaymentLedgerService.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly LedgerDbContext _db;
+        private readonly IConnectionMultiplexer _redis;
 
-        public AccountsController(LedgerDbContext db)
+        public AccountsController(LedgerDbContext db, IConnectionMultiplexer redis)
         {
             _db = db;
+            _redis = redis;
         }
 
         public class CreateAccountRequest
@@ -44,7 +47,22 @@ namespace PaymentLedgerService.Controllers
             if (!accountExists)
                 return NotFound();
 
-            // Balance derive karna: Credits - Debits (agar Debit means paisa gaya, Credit means aaya)
+            var cacheDb = _redis.GetDatabase();
+            var cacheKey = $"balance:account:{id}";
+
+            // Step 1: Pehle cache check karo
+            var cachedValue = await cacheDb.StringGetAsync(cacheKey);
+            if (cachedValue.HasValue)
+            {
+                return Ok(new
+                {
+                    AccountId = id,
+                    BalanceMinorUnits = long.Parse(cachedValue!),
+                    Source = "cache"
+                });
+            }
+
+            // Step 2: Cache miss — DB se calculate karo
             var credits = await _db.LedgerEntries
                 .Where(e => e.AccountId == id && e.Type == EntryType.Credit)
                 .SumAsync(e => e.AmountMinorUnits);
@@ -55,7 +73,16 @@ namespace PaymentLedgerService.Controllers
 
             var balanceMinorUnits = credits - debits;
 
-            return Ok(new { AccountId = id, BalanceMinorUnits = balanceMinorUnits });
+            // Step 3: Cache mein save karo, 60 second expiry ke sath
+            // (expiry safety-net hai — agar kabhi invalidation miss ho jaye, cache khud hi stale nahi rahega zyada der)
+            await cacheDb.StringSetAsync(cacheKey, balanceMinorUnits, TimeSpan.FromSeconds(60));
+
+            return Ok(new
+            {
+                AccountId = id,
+                BalanceMinorUnits = balanceMinorUnits,
+                Source = "database"
+            });
         }
 
         [HttpGet("/api/ledger/verify")]
