@@ -11,6 +11,7 @@ namespace PaymentLedgerService.Data
         public DbSet<LedgerEntry> LedgerEntries => Set<LedgerEntry>();
         public DbSet<IdempotencyKey> IdempotencyKeys => Set<IdempotencyKey>();
         public DbSet<WebhookEvent> WebhookEvents => Set<WebhookEvent>();
+        public DbSet<PaymentIntent> PaymentIntents => Set<PaymentIntent>();
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<LedgerEntry>(entity =>
@@ -35,6 +36,10 @@ namespace PaymentLedgerService.Data
             {
                 // Yehi duplicate events ko rokta hai — same ProviderEventId dobara insert nahi ho sakta
                 entity.HasIndex(e => e.ProviderEventId).IsUnique();
+            });
+            modelBuilder.Entity<PaymentIntent>(entity =>
+            {
+                entity.HasIndex(e => e.Status);
             });
         }
     }
